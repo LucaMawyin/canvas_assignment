@@ -2,6 +2,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let canvas = document.getElementById("canvas");
 
+    class Triangle {
+
+        constructor(sideLength, strokeColor, fillColor) {
+            this.sideLength = sideLength;
+            this.strokeColor = strokeColor;
+            this.fillColor = fillColor;
+            
+        }
+        draw () {
+            canvas.strokeStyle = this.strokeColor;
+            canvas.fillStyle = this.fillColor;
+
+        }
+        
+    
+    }
+    
+    class Circle {
+        constructor(radius, strokeColor, fillColor) {
+            this.radius = radius;
+            this.strokeColor = strokeColor;
+            this.fillColor = fillColor;        
+        }
+    }
+    
+    class Square {
+        constructor(width, strokeColor, fillColor) {
+            this.width = width;
+            this.strokeColor = strokeColor;
+            this.fillColor = fillColor;       
+        }
+    }
     document.querySelectorAll('body button').forEach(button => {
 
 
@@ -22,24 +54,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-class Triangle {
-    constructor(sideLength, color) {
-        this.sideLength = sideLength;
-        this.color = color;
-    }
-
-}
-
-class Circle {
-    constructor(radius, color) {
-        this.radius = radius;
-        this.color = color;
-    }
-}
-
-class Square {
-    constructor(width, color) {
-        this.width = width;
-        this.color = color;
-    }
-}
