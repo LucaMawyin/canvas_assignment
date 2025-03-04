@@ -1,52 +1,57 @@
 
 document.addEventListener('DOMContentLoaded', () => {
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext('2d');
 
-    // Ensure canvas has a proper size
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    let canvas = document.getElementById("canvas");
 
-    let drawing = false;
+    class Triangle {
 
-function getMousePos(e) {
-        const rect = canvas.getBoundingClientRect();
-        console.log(e.clientX - rect.left, e.clientY - rect.top);
-        return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
-        };
+        constructor(sideLength, strokeColor, fillColor) {
+            this.sideLength = sideLength;
+            this.strokeColor = strokeColor;
+            this.fillColor = fillColor;
+            
+        }
+        draw () {
+            canvas.strokeStyle = this.strokeColor;
+            canvas.fillStyle = this.fillColor;
+
+        }
+        
+    
     }
-
-    function startDraw(e) {
-        drawing = true;
-        const pos = getMousePos(e);
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
-        ctx.lineTo(pos.x, pos.y); // Draw a small initial dot
-        ctx.stroke();
+    
+    class Circle {
+        constructor(radius, strokeColor, fillColor) {
+            this.radius = radius;
+            this.strokeColor = strokeColor;
+            this.fillColor = fillColor;        
+        }
     }
-
-    function draw(e) {
-        if (!drawing) return;
-        const pos = getMousePos(e);
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
+    
+    class Square {
+        constructor(width, strokeColor, fillColor) {
+            this.width = width;
+            this.strokeColor = strokeColor;
+            this.fillColor = fillColor;       
+        }
     }
+    document.querySelectorAll('body button').forEach(button => {
 
-    function stopDraw() {
-        drawing = false;
-        ctx.beginPath(); // Reset path to avoid connecting new strokes
+
+        button.addEventListener('click', () => {
+            draw(button.id)
+        });
+
+    });
+
+
+    function draw(shape) {
+        switch (shape.toLowerCase()){
+            case "reset":
+                const context = canvas.getContext('2d');
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                break;
+        }
     }
-
-    // Set drawing properties
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = "black";
-
-    // Event listeners
-    canvas.addEventListener("mousedown", startDraw);
-    canvas.addEventListener("mousemove", draw);
-    canvas.addEventListener("mouseup", stopDraw);
-    canvas.addEventListener("mouseleave", stopDraw);
 });
+
