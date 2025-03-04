@@ -15,6 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
             canvas.strokeStyle = this.strokeColor;
             canvas.fillStyle = this.fillColor;
 
+
+
+            canvas.beginPath();
+
         }
         
     
