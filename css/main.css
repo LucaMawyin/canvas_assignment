@@ -18,8 +18,10 @@ body,html{
 }
 
 #canvas{
+    background-color: gray;
     width: 75vw;
-    height: 75vh;
+    height: auto;
+    aspect-ratio: 2 / 1;
 }
 
 .menu{

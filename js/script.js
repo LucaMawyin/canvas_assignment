@@ -1,51 +1,52 @@
-let startX = 0;
-let startY = 0;
-let endX = 0;
-let endY = 0;
 
 document.addEventListener('DOMContentLoaded', () => {
-
-    let current = null;
-
-    // Tracking current shape
-    document.querySelectorAll('#shape-btn input').forEach(button => {
-        button.addEventListener('click', () => {
-            current = button.value;
-        });
-    });
-
     const canvas = document.getElementById("canvas");
-    const context = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
 
-    let clicked = false;
+    // Ensure canvas has a proper size
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    canvas.addEventListener("click", function(e) {
+    let drawing = false;
 
-        clicked = !clicked;
+function getMousePos(e) {
+        const rect = canvas.getBoundingClientRect();
+        console.log(e.clientX - rect.left, e.clientY - rect.top);
+        return {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
+    }
 
-        if (clicked)
-        {
-            startX = e.pageX - canvas.offsetLeft;
-            startY = e.pageY - canvas.offsetTop;
-            console.log(startX,startY);
-        }
-        else{
-            endX = e.pageX - canvas.offsetLeft;
-            endY = e.pageY - canvas.offsetTop;
+    function startDraw(e) {
+        drawing = true;
+        const pos = getMousePos(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+        ctx.lineTo(pos.x, pos.y); // Draw a small initial dot
+        ctx.stroke();
+    }
 
-            console.log(endX, endY);
+    function draw(e) {
+        if (!drawing) return;
+        const pos = getMousePos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+    }
 
-            draw(context);
-        }
+    function stopDraw() {
+        drawing = false;
+        ctx.beginPath(); // Reset path to avoid connecting new strokes
+    }
 
-    });
+    // Set drawing properties
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "black";
+
+    // Event listeners
+    canvas.addEventListener("mousedown", startDraw);
+    canvas.addEventListener("mousemove", draw);
+    canvas.addEventListener("mouseup", stopDraw);
+    canvas.addEventListener("mouseleave", stopDraw);
 });
-
-function draw(context)
-{
-    context.beginPath();
-    context.moveTo(startX, startY);
-    context.lineTo(endX,endY);
-    context.stroke();
-}
-
