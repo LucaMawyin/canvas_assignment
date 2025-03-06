@@ -2,11 +2,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let current = null;
 
+    // Tracking current shape
     document.querySelectorAll('#shape-btn input').forEach(button => {
         button.addEventListener('click', () => {
             current = button.value;
         });
     });
+
+    
 
     let canvas = document.getElementById("board");
     const context = canvas.getContext('2d');
