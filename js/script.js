@@ -1,3 +1,8 @@
+let startX = 0;
+let startY = 0;
+let endX = 0;
+let endY = 0;
+
 document.addEventListener('DOMContentLoaded', () => {
 
     let current = null;
@@ -9,26 +14,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    
+    const canvas = document.getElementById("canvas");
+    const context = canvas.getContext("2d");
 
-    let canvas = document.getElementById("board");
-    const context = canvas.getContext('2d');
-    let canvasX = 0;
-    let canvasY = 0;
     let clicked = false;
 
-    canvas.addEventListener("click", () => {
+    canvas.addEventListener("click", function(e) {
 
         clicked = !clicked;
-        console.log("click");
-    });
 
-    canvas.addEventListener("mousemove", function(e) {
+        if (clicked)
+        {
+            startX = e.pageX - canvas.offsetLeft;
+            startY = e.pageY - canvas.offsetTop;
+            console.log(startX,startY);
+        }
+        else{
+            endX = e.pageX - canvas.offsetLeft;
+            endY = e.pageY - canvas.offsetTop;
 
-        // If the user has already clicked then start tracking mouse
-        if (clicked){
-            console.log(e.pageX, e.pageY);
-        }        
+            console.log(endX, endY);
+
+            draw(context);
+        }
+
     });
 });
+
+function draw(context)
+{
+    context.beginPath();
+    context.moveTo(startX, startY);
+    context.lineTo(endX,endY);
+    context.stroke();
+}
 
