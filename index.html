@@ -10,31 +10,35 @@
 </head>
 
 <body>
-    <div id="main-board">
-        <h1>Drawing Board</h1>
-        <canvas id="board" width="700" height="500"></canvas>
-        <br>  
-    </div>
 
-    <div class="menu"> 
+    <h1>Drawing Board</h1>
 
-        <div id="shape-btn">
-            <input type="button" value="Square">
-            <input type="button" value="Triangle">
-            <input type="button" value="Circle">
+    <div id="content">
+        <div id="main-board">
+            <canvas id="board"></canvas>
+            <br>  
         </div>
-
-        <div id="preference-btn">
-            <div><p>Border Colour: </p><input type="color" value="Border Color"></div>
-            <div><p>Shape Colour: </p><input type="color" value="Shape Color"></div>
+    
+        <div class="menu"> 
+    
+            <div id="shape-btn">
+                <input type="button" value="Square">
+                <input type="button" value="Triangle">
+                <input type="button" value="Circle">
+            </div>
+    
+            <div id="preference-btn">
+                <div><p>Border Colour:&nbsp</p><input type="color" value="Border Color"></div>
+                <div><p>Shape Colour:&nbsp</p><input type="color" value="Shape Color"></div>
+            </div>
+    
+            <div id="edit-btn">
+                <input type="button" value="Reset"> 
+                <input type="button" value="Undo"> 
+                <input type="button" value="Redo"> 
+            </div>
         </div>
-
-        <div id="edit-btn">
-            <input type="button" value="Reset"> 
-            <input type="button" value="Undo"> 
-            <input type="button" value="Redo"> 
-        </div>
-             
+     
     </div>
 
     
