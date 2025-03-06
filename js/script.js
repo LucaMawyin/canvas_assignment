@@ -1,24 +1,26 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    let canvas = document.getElementById("canvas");
+    let canvas = document.getElementById("board");
+    const context = canvas.getContext('2d');
 
     class Triangle {
 
-        constructor(sideLength, strokeColor, fillColor) {
+        constructor(x, y, sideLength, strokeColor, fillColor) {
             this.sideLength = sideLength;
             this.strokeColor = strokeColor;
             this.fillColor = fillColor;
             
         }
         draw () {
-            canvas.strokeStyle = this.strokeColor;
-            canvas.fillStyle = this.fillColor;
+            context.strokeStyle = this.strokeColor;
+            context.fillStyle = this.fillColor;
+            context.lineWidth = 5;
+            context.beginPath();
+            context.moveTo(59, 50);
+            context.lineTo(0, 0);
+            context.stroke();
 
-
-
-            canvas.beginPath();
-
-        }
+        }   
         
     
     }
@@ -47,12 +49,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
 
-
+    let test = new Triangle (0, 0, 10, "rgb(255, 255, 255)", "rgb(255, 255, 255)");
+    test.draw();
     function draw(shape) {
         switch (shape.toLowerCase()){
             case "reset":
-                const context = canvas.getContext('2d');
+                
                 context.clearRect(0, 0, canvas.width, canvas.height);
+      
+                console.log("sad");
                 break;
         }
     }
