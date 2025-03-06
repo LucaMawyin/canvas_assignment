@@ -18,16 +18,12 @@ document.addEventListener("DOMContentLoaded", () => {
         offsetX = canvas.offsetLeft;
         offsetY = canvas.offsetTop;
     };
-
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
     // Init values
     let current = null;
     let drawing = false;
-
-    let startX, startY;
-    let endX, endY;
 
     // Tracking current shape
     document.querySelectorAll('#shape-btn input').forEach(button => {
@@ -44,31 +40,25 @@ document.addEventListener("DOMContentLoaded", () => {
                     current = new Circle(canvas, ctx);
                     break;
             }
-            console.log(current.constructor.name);
         });
     });
 
-    function drawLine(){
-        ctx.lineTo(startX, startY);
-        ctx.lineTo(endX,endY);
-        ctx.stroke();
-        ctx.beginPath();
-    }
-
+    // Drawing shape
     canvas.addEventListener("mousedown", e => {
 
         if (current == null) return;
 
-        if (!drawing)
-        {
-            current.startDraw(e);
-        }
-
-        else{
-            current.stopDraw(e);
-        }
+        if (!drawing) current.startDraw(e);
+        else current.stopDraw(e);
 
         drawing = !drawing;
+    });
+
+    // Updating shape on mousemove
+    canvas.addEventListener("mousemove", e => {
+        if (!drawing) return;
+
+        current.stopDraw(e);
     });
 });
 
@@ -126,24 +116,45 @@ class Circle{
         this.startY;
         this.endX;
         this.endY;
+        this.drawing = false;
+        this.savedCanvas=null;
     }
 
     startDraw(e){
-        const rect = this.canvas.getBoundingClientRect();
 
+        // Setting initial points
+        const rect = this.canvas.getBoundingClientRect();
         this.startX = e.clientX - rect.left;
         this.startY = e.clientY - rect.top;
-        console.log("Start:", this.startX, this.startY);
+
+        // Saving current state of board
+        this.drawing = true;
+        this.savedCanvas = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
     }
 
     stopDraw(e){
+        this.drawing = false;
+        this.updateShape(e);
+    }
+
+    updateShape(e){
+
+        // Getting endpoints
         const rect = this.canvas.getBoundingClientRect();
         this.endX = e.clientX - rect.left;
         this.endY = e.clientY - rect.top;
-        console.log("End:", this.endX, this.endY);
 
-        this.ctx.lineTo(this.startX, this.startY);
-        this.ctx.lineTo(this.endX, this.endY);
+        // Calculating circle values
+        this.radius = (1/2)*Math.sqrt((this.endX - this.startX)**2 + (this.endY - this.startY)**2);
+        this.centreX = (1/2)*(this.startX+this.endX);
+        this.centreY = (1/2)*(this.startY+this.endY);
+
+        // Restoring old canvas before adding new shape
+        this.ctx.putImageData(this.savedCanvas, 0, 0);
+
+        // Printing final shape onto canvas
+        this.ctx.beginPath();
+        this.ctx.arc(this.centreX,this.centreY,this.radius,0,2*Math.PI);
         this.ctx.stroke();
         this.ctx.beginPath();
     }
