@@ -1,5 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    let current = null;
+
+    document.querySelectorAll('#shape-btn input').forEach(button => {
+        button.addEventListener('click', () => {
+            current = button.value;
+        });
+    });
+
     let canvas = document.getElementById("board");
     const context = canvas.getContext('2d');
     let canvasX = 0;
