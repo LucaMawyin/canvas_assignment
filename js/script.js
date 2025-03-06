@@ -3,6 +3,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let canvas = document.getElementById("board");
     const context = canvas.getContext('2d');
+    let canvasX = 0;
+    let canvasY = 0;
+    canvas.addEventListener("mousemove", function(e) {
+        console.log(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
+        canvasX = e.pageX - this.offsetLeft;
+        canvasY =  e.pageY - this.offsetTop;
+
+    });
 
     class Triangle {
 
@@ -58,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 context.clearRect(0, 0, canvas.width, canvas.height);
       
-                console.log("sad");
                 break;
         }
     }
