@@ -10,20 +10,32 @@
 </head>
 
 <body>
-    <div id="main-board">
-        <h1>Drawing Board</h1>
-        <canvas id="board" width="700" height="500"></canvas>
-        <br>
-        <input type="button" value="Square" id="square">
-        <input type="button" value="Triangle" id="triangle">
-        <input type="button" value="Circle" id="circle">
-        <input type="button" value="Reset" id="reset">        
-    </div>
 
-    <div id="menu"> 
-        <input type="number" id="size">
-        <input type="color" id="fillClr">
-        <input type="color" id="borderClr">
+    <h1>Drawing Board</h1>
+
+    <div id="content">
+        <canvas id="canvas" style="width: 75vw; height: auto; aspect-ratio: 2 / 1;"></canvas>
+    
+        <div class="menu"> 
+    
+            <div id="shape-btn">
+                <input type="button" value="Rectangle">
+                <input type="button" value="Triangle">
+                <input type="button" value="Circle">
+            </div>
+    
+            <div id="preference-btn">
+                <div><p>Border Colour:&nbsp</p><input type="color"></div>
+                <div><p>Shape Colour:&nbsp</p><input type="color"></div>
+            </div>
+    
+            <div id="edit-btn">
+                <input type="button" value="Reset"> 
+                <input type="button" value="Undo"> 
+                <input type="button" value="Redo"> 
+            </div>
+        </div>
+     
     </div>
 
     
