@@ -14,22 +14,23 @@
     <h1>Drawing Board</h1>
 
     <div id="content">
-        <div id="main-board">
-            <canvas id="board"></canvas>
-            <br>  
-        </div>
+        <canvas id="canvas" style="width: 75vw; height: auto; aspect-ratio: 2 / 1;"></canvas>
+
     
         <div class="menu"> 
     
             <div id="shape-btn">
-                <input type="button" value="Square">
+                <input type="button" value="Rectangle">
                 <input type="button" value="Triangle">
                 <input type="button" value="Circle">
             </div>
     
             <div id="preference-btn">
-                <div><p>Border Colour:&nbsp</p><input type="color" value="Border Color"></div>
-                <div><p>Shape Colour:&nbsp</p><input type="color" value="Shape Color"></div>
+                <div><p>Border Colour:&nbsp</p><input id="border-color" type="color"></div>
+                <div><p>Shape Colour:&nbsp</p><input id="shape-color" type="color"></div>
+                <div><p>Width:&nbsp</p><input id="width" type="number"></div>
+                <div><p>Height:&nbsp</p><input id="height" type="number"></div>
+
             </div>
     
             <div id="edit-btn">

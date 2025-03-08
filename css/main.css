@@ -15,12 +15,12 @@ body,html{
 #content{
     display: flex;
     justify-content: center;
-}
 
-#main-board{
-    background-color: black;
+#canvas{
+    background-color: gray;
     width: 75vw;
-    height: 75vh;
+    height: auto;
+    aspect-ratio: 2 / 1;
 }
 
 .menu{
@@ -30,4 +30,5 @@ body,html{
 
 #preference-btn{
     display: flex;
+    flex-wrap: wrap;
 }
