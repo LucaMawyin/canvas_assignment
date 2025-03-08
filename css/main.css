@@ -16,7 +16,6 @@ body,html{
     display: flex;
     justify-content: center;
 }
-
 #canvas{
     background-color: gray;
     width: 75vw;
