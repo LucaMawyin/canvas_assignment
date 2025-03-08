@@ -31,4 +31,5 @@ body,html{
 
 #preference-btn{
     display: flex;
+    flex-wrap: wrap;
 }
