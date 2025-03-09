@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+    let shapeList = JSON.parse(localStorage.getItem("shapeList")) || [];    
+
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext('2d');
 
@@ -49,7 +51,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (current == null) return;
 
         if (!drawing) current.startDraw(e);
-        else current.stopDraw(e);
+        else {
+            current.stopDraw(e);
+            shapeList.push(current);
+            saveShapesToStorage();
+        }
 
         drawing = !drawing;
     });
@@ -57,9 +63,51 @@ document.addEventListener("DOMContentLoaded", () => {
     // Updating shape on mousemove
     canvas.addEventListener("mousemove", e => {
         if (!drawing) return;
-
         current.stopDraw(e);
+        
     });
+
+    const loadShapes = () => {
+        const storedShapes = JSON.parse(localStorage.getItem("shapeList")) || [];
+
+        shapeList = storedShapes.map(data => {
+            let shape;
+            switch (data.type) {
+                case "Triangle":
+                    shape = new Triangle(canvas, ctx);
+                    break;
+                case "Square":
+                    shape = new Square(canvas, ctx);
+                    break;
+                case "Circle":
+                    shape = new Circle(canvas, ctx);
+                    break;
+            }
+
+            // Restore properties
+            Object.assign(shape, data);
+            shape.loadShape();
+            return shape;
+        });
+    };
+
+    const saveShapesToStorage = () => {
+        const serializableShapes = shapeList.map(shape => ({
+            type: shape.constructor.name,
+            startX: shape.startX,
+            startY: shape.startY,
+            endX: shape.endX,
+            endY: shape.endY,
+            width: shape.width || null,
+            height: shape.height || null,
+            centreX: shape.centreX || null,
+            centreY: shape.centreY || null,
+            radius: shape.radius || null
+        }));
+    
+        localStorage.setItem("shapeList", JSON.stringify(serializableShapes));
+    };
+    loadShapes();
 });
 
 class Triangle{
@@ -73,15 +121,19 @@ class Triangle{
     }
 
     startDraw(e){
-        this.startX = e.clientX;
-        this.startY = e.clientY;
-        console.log("Start:", this.startX, this.startY);
+        // Setting initial points
+        const rect = this.canvas.getBoundingClientRect();
+        this.startX = e.clientX - rect.left;
+        this.startY = e.clientY - rect.top;
+
+        // Saving current state of board
+        this.drawing = true;
+        this.savedCanvas = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
     }
 
     stopDraw(e){
         this.endX = e.clientX;
         this.endY = e.clientY;
-        console.log("End:", this.endX, this.endY);
     }
 }
 
@@ -93,18 +145,49 @@ class Square{
         this.startY;
         this.endX;
         this.endY;
+        this.drawing = false;
+        this.savedCanvas = null;
     }
 
     startDraw(e){
-        this.startX = e.clientX;
-        this.startY = e.clientY;
-        console.log("Start:", this.startX, this.startY);
+        // Setting initial points
+        const rect = this.canvas.getBoundingClientRect();
+        this.startX = e.clientX - rect.left;
+        this.startY = e.clientY - rect.top;
+
+        // Saving current state of board
+        this.drawing = true;
+        this.savedCanvas = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
     }
 
     stopDraw(e){
-        this.endX = e.clientX;
-        this.endY = e.clientY;
-        console.log("End:", this.endX, this.endY);
+        this.drawing = false;
+        this.updateShape(e);
+    }
+
+    updateShape(e){
+        const rect = this.canvas.getBoundingClientRect();
+        this.endX = e.clientX - rect.left;
+        this.endY = e.clientY - rect.top;        
+
+        // Restoring old canvas before adding new shape
+        this.ctx.putImageData(this.savedCanvas, 0, 0);
+
+        // Calculating values
+        this.width = this.endX-this.startX;
+        this.height = this.endY-this.startY;
+
+        this.ctx.beginPath();
+        this.ctx.rect(this.startX,this.startY,this.width,this.height);
+        this.ctx.stroke();
+        this.ctx.beginPath();
+    }
+
+    loadShape(){
+        this.ctx.beginPath();
+        this.ctx.rect(this.startX,this.startY,this.width,this.height);
+        this.ctx.stroke();
+        this.ctx.beginPath();        
     }
 }
 
@@ -157,5 +240,12 @@ class Circle{
         this.ctx.arc(this.centreX,this.centreY,this.radius,0,2*Math.PI);
         this.ctx.stroke();
         this.ctx.beginPath();
+    }
+
+    loadShape(){
+        this.ctx.beginPath();
+        this.ctx.arc(this.centreX,this.centreY,this.radius,0,2*Math.PI);
+        this.ctx.stroke();
+        this.ctx.beginPath();        
     }
 }
