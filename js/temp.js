@@ -9,10 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Shape objects
     class Triangle{
-        constructor (canvas, ctx){
+        constructor (){
             this.type = "Triangle"
-            this.canvas = canvas;
-            this.ctx = ctx;
             this.startX;
             this.startY;
             this.endX;
@@ -144,6 +142,50 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    class Brush{
+        constructor (){
+            this.type = "Brush"
+            this.startX;
+            this.startY;
+            this.endX;
+            this.endY;
+            this.drawing = false;
+        }
+    
+        startDraw(e){
+            // Setting initial points
+            const rect = canvas.getBoundingClientRect();
+            this.startX = e.clientX - rect.left;
+            this.startY = e.clientY - rect.top;
+    
+            // Saving current state of board
+            this.drawing = true;
+            savedCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        }
+
+        stopDraw(e){
+
+            console.log("End:",this.endX,this.endY)
+
+            const rect = canvas.getBoundingClientRect();
+            this.endX = e.clientX - rect.left;
+            this.endY = e.clientY - rect.top;   
+
+            ctx.beginPath();
+            ctx.lineTo(this.startX, this.startY);
+            ctx.lineTo(this.endX,this.endY);
+            ctx.stroke();
+            ctx.beginPath();
+        }
+
+        updateShape(){
+        }
+
+        loadShape(){
+
+        }
+    }
+
     // Setting canvas size here
     // Wonky cursor stuff happens when styled in css
     const resizeCanvas = () => {
@@ -176,9 +218,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 Object.assign(circle, shape);
                 return circle;
             case "Triangle":
-                let triangle = new Triangle(canvas, ctx);
+                let triangle = new Triangle();
                 Object.assign(triangle, shape);
                 return triangle;
+            case "Brush":
+                let brush = new Brush();
+                Object.assign(brush, shape);
+                return brush;
         }
     });
     shapeList.forEach(shape => shape.loadShape());
@@ -189,13 +235,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
             switch(button.value){
                 case "Triangle":
-                    current = new Triangle(canvas, ctx);
+                    current = new Triangle();
                     break;
                 case "Square":
-                    current = new Square(canvas, ctx);
+                    current = new Square();
                     break;
                 case "Circle":
-                    current = new Circle(canvas, ctx);
+                    current = new Circle();
+                    break;
+
+                case "Brush":
+                    current = new Brush();
                     break;
             }
         });
@@ -223,10 +273,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // User wants to reset the board
+    const resetAlert = document.getElementById("reset-board");
     document.querySelector("#edit-btn input[value='Reset']").addEventListener("click", () => {
         localStorage.removeItem('shapeList');
         shapeList = [];
         current = null;
         ctx.clearRect(0,0,canvas.width,canvas.height);
+        resetAlert.showModal();
     });
+
+    document.querySelector('#reset-board button').addEventListener('click', () => {
+        resetAlert.close();
+    })
 });
