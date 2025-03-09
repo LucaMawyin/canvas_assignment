@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    let shapeList = JSON.parse(localStorage.getItem("shapeList")) || [];    
-
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext('2d');
     let savedCanvas = null;
@@ -12,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Shape objects
     class Triangle{
         constructor (canvas, ctx){
+            this.type = "Triangle"
             this.canvas = canvas;
             this.ctx = ctx;
             this.startX;
@@ -39,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     class Square{
         constructor (){
+            this.type = "Square"
             this.startX;
             this.startY;
             this.endX;
@@ -90,6 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     class Circle{
         constructor (){
+            this.type = "Circle"
             this.startX;
             this.startY;
             this.endX;
@@ -162,6 +163,26 @@ document.addEventListener("DOMContentLoaded", () => {
     let current = null;
     let drawing = false;
 
+    // Loading objects from localStorage
+    let shapeList = JSON.parse(localStorage.getItem("shapeList")) || [];
+    shapeList = shapeList.map(shape => {
+        switch (shape.type) {
+            case "Square":
+                let square = new Square();
+                Object.assign(square, shape); // Copy properties
+                return square;
+            case "Circle":
+                let circle = new Circle();
+                Object.assign(circle, shape);
+                return circle;
+            case "Triangle":
+                let triangle = new Triangle(canvas, ctx);
+                Object.assign(triangle, shape);
+                return triangle;
+        }
+    });
+    shapeList.forEach(shape => shape.loadShape());
+
     // Tracking current shape
     document.querySelectorAll('#shape-btn input').forEach(button => {
         button.addEventListener('click', () => {
@@ -189,7 +210,6 @@ document.addEventListener("DOMContentLoaded", () => {
         else {
             current.stopDraw(e);
             shapeList.push(current);
-            console.log(shapeList);
             localStorage.setItem("shapeList", JSON.stringify(shapeList));
         }
 
@@ -200,6 +220,13 @@ document.addEventListener("DOMContentLoaded", () => {
     canvas.addEventListener("mousemove", e => {
         if (!drawing) return;
         current.stopDraw(e);
-        
+    });
+
+    // User wants to reset the board
+    document.querySelector("#edit-btn input[value='Reset']").addEventListener("click", () => {
+        localStorage.removeItem('shapeList');
+        shapeList = [];
+        current = null;
+        ctx.clearRect(0,0,canvas.width,canvas.height);
     });
 });
