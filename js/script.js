@@ -222,7 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function draw(e) {
 
         if (!drawing) return;
-        console.log(current);
 
         const pos = getMousePos(e);
         switch (current.shape) {
