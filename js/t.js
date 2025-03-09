@@ -56,19 +56,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     canvas.addEventListener("mousedown", e => {
+        if (!drawing){
+            startX = e.clientX - offsetX;
+            startY = e.clientY - offsetY;
 
-        if (current == null) return;
-
-        if (!drawing)
-        {
-            current.startDraw(e);
+            console.log("Start Position:", startX, startY); 
+            ctx.lineTo(startX, startY);       
+            drawing = true;    
         }
 
         else{
-            current.stopDraw(e);
-        }
 
-        drawing = !drawing;
+            endX = e.clientX - offsetX;
+            endY = e.clientY - offsetY;
+
+            console.log("End Position:", endX, endY);
+
+            ctx.stroke();
+            ctx.beginPath();         
+            
+            drawLine();
+            
+            drawing = false;
+        }
+    });
+
+    canvas.addEventListener("mousemove", e => {
+
+
+        if(!drawing) return;
+
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+
+        ctx.lineTo(e.clientX - offsetX, e.clientY - offsetY);
+        ctx.stroke();
     });
 });
 
@@ -141,10 +163,5 @@ class Circle{
         this.endX = e.clientX - rect.left;
         this.endY = e.clientY - rect.top;
         console.log("End:", this.endX, this.endY);
-
-        this.ctx.lineTo(this.startX, this.startY);
-        this.ctx.lineTo(this.endX, this.endY);
-        this.ctx.stroke();
-        this.ctx.beginPath();
     }
 }
