@@ -4,6 +4,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const ctx = canvas.getContext('2d');
     let savedCanvas = null;
 
+    let borderWidth = localStorage.getItem('borderWidth') || 2;
+    let borderColour = localStorage.getItem('borderColour') || "#000000";
+    let shapeColour = localStorage.getItem('shapeColour') || "#FFFFFF";
+
+    document.getElementById("border-colour").value = borderColour;
+    document.getElementById("border-width").value = borderWidth;
+    document.getElementById("shape-colour").value = shapeColour;
+
     let offsetX;
     let offsetY;
 
@@ -15,6 +23,9 @@ document.addEventListener("DOMContentLoaded", () => {
             this.startY;
             this.endX;
             this.endY;
+            this.shapeColour = shapeColour;
+            this.borderColour = borderColour;
+            this.borderWidth = borderWidth;
         }
     
         startDraw(e){
@@ -25,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
             // Saving current state of board
             this.drawing = true;
-            savedCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            savedCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height, { willReadFrequently: true });
         }
     
         stopDraw(e){
@@ -41,7 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
             this.startY;
             this.endX;
             this.endY;
-            this.drawing = false;
+            this.shapeColour = shapeColour;
+            this.borderColour = borderColour;
+            this.borderWidth = borderWidth;
         }
     
         startDraw(e){
@@ -51,12 +64,10 @@ document.addEventListener("DOMContentLoaded", () => {
             this.startY = e.clientY - rect.top;
     
             // Saving current state of board
-            this.drawing = true;
-            savedCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            savedCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height, { willReadFrequently: true });
         }
     
         stopDraw(e){
-            this.drawing = false;
             this.updateShape(e);
         }
     
@@ -72,7 +83,13 @@ document.addEventListener("DOMContentLoaded", () => {
             this.height = this.endY-this.startY;
     
             ctx.beginPath();
+
             ctx.rect(this.startX,this.startY,this.width,this.height);
+            ctx.fillStyle = this.shapeColour;
+            ctx.lineWidth = this.borderWidth;
+            ctx.fill();
+
+            ctx.strokeStyle = this.borderColour;
             ctx.stroke();
             ctx.beginPath();
         }
@@ -80,6 +97,12 @@ document.addEventListener("DOMContentLoaded", () => {
         loadShape(){
             ctx.beginPath();
             ctx.rect(this.startX,this.startY,this.width,this.height);
+
+            ctx.fillStyle = this.shapeColour;
+            ctx.lineWidth = this.borderWidth;
+            ctx.fill();
+
+            ctx.strokeStyle = this.borderColour;
             ctx.stroke();
             ctx.beginPath();        
         }
@@ -92,7 +115,9 @@ document.addEventListener("DOMContentLoaded", () => {
             this.startY;
             this.endX;
             this.endY;
-            this.drawing = false;
+            this.shapeColour = shapeColour;
+            this.borderColour = borderColour;
+            this.borderWidth = borderWidth;
         }
     
         startDraw(e){
@@ -102,12 +127,10 @@ document.addEventListener("DOMContentLoaded", () => {
             this.startY = e.clientY - rect.top;
     
             // Saving current state of board
-            this.drawing = true;
-            savedCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            savedCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height, { willReadFrequently: true });
         }
     
         stopDraw(e){
-            this.drawing = false;
             this.updateShape(e);
         }
     
@@ -129,15 +152,27 @@ document.addEventListener("DOMContentLoaded", () => {
             // Printing final shape onto canvas
             ctx.beginPath();
             ctx.arc(this.centreX,this.centreY,this.radius,0,2*Math.PI);
+
+            ctx.fillStyle = this.shapeColour;
+            ctx.lineWidth = this.borderWidth;
+            ctx.fill();
+
+            ctx.strokeStyle = this.borderColour;
             ctx.stroke();
-            ctx.beginPath();
+            ctx.beginPath();      
         }
     
         loadShape(){
             ctx.beginPath();
             ctx.arc(this.centreX,this.centreY,this.radius,0,2*Math.PI);
+
+            ctx.fillStyle = this.shapeColour;
+            ctx.lineWidth = this.borderWidth;
+            ctx.fill();
+
+            ctx.strokeStyle = this.borderColour;
             ctx.stroke();
-            ctx.beginPath();        
+            ctx.beginPath();           
         }
     }
 
@@ -159,30 +194,37 @@ document.addEventListener("DOMContentLoaded", () => {
     
             // Saving current state of board
             this.drawing = true;
-            savedCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        }
-
-        stopDraw(e){
-
-            console.log("End:",this.endX,this.endY)
-
-            const rect = canvas.getBoundingClientRect();
-            this.endX = e.clientX - rect.left;
-            this.endY = e.clientY - rect.top;   
+            savedCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height, { willReadFrequently: true });
 
             ctx.beginPath();
             ctx.lineTo(this.startX, this.startY);
-            ctx.lineTo(this.endX,this.endY);
-            ctx.stroke();
+        }
+
+        draw(e) {
+            if (!this.drawing) return;
+    
+            const rect = canvas.getBoundingClientRect();
+            const currentX = e.clientX - rect.left;
+            const currentY = e.clientY - rect.top;
+    
             ctx.beginPath();
+            ctx.moveTo(this.lastX, this.lastY);
+            ctx.lineTo(currentX, currentY);
+            ctx.lineWidth = this.borderWidth;
+            ctx.strokeStyle = this.borderColour;
+            ctx.stroke();
+    
+            this.lastX = currentX;
+            this.lastY = currentY;
         }
 
-        updateShape(){
+        stopDraw(e){
+            this.drawing = false;
         }
 
-        loadShape(){
-
-        }
+        // These need to be here because they get called automatically
+        updateShape(){}
+        loadShape(){}
     }
 
     // Setting canvas size here
@@ -207,10 +249,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Loading objects from localStorage
     let shapeList = JSON.parse(localStorage.getItem("shapeList")) || [];
     shapeList = shapeList.map(shape => {
+
+        // Basically just recreating objects
+        // Objects dissapear after code is stopped
         switch (shape.type) {
             case "Square":
                 let square = new Square();
-                Object.assign(square, shape); // Copy properties
+                Object.assign(square, shape);
                 return square;
             case "Circle":
                 let circle = new Circle();
@@ -240,14 +285,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     document.querySelectorAll('#preference-btn input').forEach(box => {
         switch (box.id.toLowerCase()) {
-            case "border-color":
-                box.addEventListener("input", () => {current.borderColor = box.value});
+            case "border-colour":
+                box.addEventListener("input", () => {
+                    borderColour = box.value;
+                    current.borderColour = borderColour;
+                    localStorage.setItem('borderColour', borderColour);
+                });
                 break;
-            case "shape-color":
-                box.addEventListener("input", () => {current.shapeColor = box.value});
+            case "shape-colour":
+                box.addEventListener("input", () => {
+                    shapeColour = box.value;
+                    current.shapeColour = shapeColour;
+                    localStorage.setItem('shapeColour', shapeColour);
+                });
+                break;
+            case "border-width":
+                box.addEventListener("input", () => {
+                    borderWidth = box.value;
+                    current.borderWidth = parseInt(borderWidth);
+                    localStorage.setItem('borderWidth', borderWidth);
+                });
                 break;
         }
     });
+    
     // Tracking current shape
     document.querySelectorAll('#shape-btn input').forEach(button => {
         button.addEventListener('click', () => {
@@ -298,15 +359,30 @@ document.addEventListener("DOMContentLoaded", () => {
     // Updating shape on mousemove
     canvas.addEventListener("mousemove", e => {
         if (!drawing) return;
-        current.stopDraw(e);
+
+        if (current instanceof Brush) {
+            current.draw(e);
+        }
+        else{
+            current.stopDraw(e);
+        }
     });
 
     // User wants to reset the board
     const resetAlert = document.getElementById("reset-board");
     document.querySelector("#edit-btn input[value='Reset']").addEventListener("click", () => {
         localStorage.removeItem('shapeList');
+        localStorage.removeItem('borderColour');
+        localStorage.removeItem('borderWidth');
+        localStorage.removeItem('shapeColour');
+        borderWidth = 2;
+        borderColour = "#000000";
+        shapeColour = "#FFFFFF";
         shapeList = [];
         current = null;
+        document.getElementById("border-colour").value = borderColour;
+        document.getElementById("border-width").value = borderWidth;
+        document.getElementById("shape-colour").value = shapeColour;
         ctx.clearRect(0,0,canvas.width,canvas.height);
         resetAlert.showModal();
     });

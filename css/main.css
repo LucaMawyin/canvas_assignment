@@ -20,8 +20,13 @@ body,html{
 }
 
 .menu{
+
+    display:flex;
+    flex-direction: column;
+
     background-color: lightgray;
     padding: 1%;
+    gap: 10%;
 }
 
 #preference-btn{
@@ -29,6 +34,19 @@ body,html{
     flex-wrap: wrap;
 }
 
+#preference-btn div{
+    width:100%;
+}
+
 #reset-board{
     text-align: center;
+}
+
+#edit-btn, #shape-btn{
+    display: flex;
+    align-items: center;
+}
+
+#edit-btn input, #shape-btn input{
+    flex-grow: 1;
 }
