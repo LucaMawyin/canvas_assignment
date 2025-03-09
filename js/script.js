@@ -132,6 +132,96 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.height = ctx["canvas"].clientHeight;
     canvas.width = ctx["canvas"].clientWidth;
 
+
+    // Tracking current shape
+    document.querySelectorAll('#shape-btn input').forEach(button => {
+        button.addEventListener('click', () => {
+            current = button.value;
+        });
+    });
+
+
+    class Triangle {
+        constructor(x, y, sideLength, strokeColor, fillColor) {
+            this.sideLength = sideLength;
+            this.strokeColor = strokeColor;
+            this.fillColor = fillColor;
+
+        }
+        draw() {
+            ctx.strokeStyle = this.strokeColor;
+            ctx.fillStyle = this.fillColor;
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(59, 50);
+            ctx.lineTo(0, 0);
+            ctx.stroke();
+
+        }
+
+
+    }
+    
+    class Circle {
+        constructor(x, y, width, height, strokeColor, fillColor) {
+            this.radius = radius;
+            this.strokeColor = strokeColor;
+            this.fillColor = fillColor;        
+        }
+
+        draw() {
+            ctx.strokeStyle = this.strokeColor;
+            ctx.fillStyle = this.fillColor;
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(59, 50);
+            ctx.lineTo(0, 0);
+            ctx.stroke();
+        }
+        clear() {
+            ctx.strokeStyle = "gray";
+            ctx.fillStyle = "gray";
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+    }
+    
+    class Square {
+        constructor(width, strokeColor, fillColor) {
+            this.width = width;
+            this.strokeColor = strokeColor;
+            this.fillColor = fillColor;       
+        }
+        draw() {
+            ctx.strokeStyle = this.strokeColor;
+            ctx.fillStyle = this.fillColor;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        }
+    }
+ 
+    document.querySelectorAll('body button').forEach(button => {
+
+
+        button.addEventListener('click', () => {
+            edit(button.value)
+        });
+
+    });
+
+   
+    function draw(shape) {
+        switch (shape.toLowerCase()) {
+            case "reset":
+
+                context.clearRect(0, 0, canvas.width, canvas.height);
+
+                break;
+        }
+    }
+    // Ensure canvas has a proper size
+
+    // canvas.width = window.innerWidth;
+    // canvas.height = window.innerHeight;
     let drawing = false;
 
     function getMousePos(e) {
@@ -197,6 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!drawing) return;
 
+
         const pos = getMousePos(e);
 
         ctx.lineTo(pos.x, pos.y);
@@ -209,8 +300,8 @@ document.addEventListener('DOMContentLoaded', () => {
             endPoint = getMousePos(e);
             
             // Decide what shape based on current selected
-            switch (current) {
-
+             
+            switch (current.shape) {
                 case "Rectangle": 
                     console.log("rect");
                     const dim = calcDimensions(startPoint, endPoint);
@@ -235,6 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event listeners
     canvas.addEventListener("mousedown", startDraw);
+    
     canvas.addEventListener("mouseup", stopDraw);
     canvas.addEventListener("mouseleave", stopDraw);
 });
