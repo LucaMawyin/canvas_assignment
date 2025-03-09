@@ -50,3 +50,7 @@ body,html{
 #edit-btn input, #shape-btn input{
     flex-grow: 1;
 }
+
+#shape-btn input.active{
+    background-color: gray;
+}

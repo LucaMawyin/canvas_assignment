@@ -1,9 +1,17 @@
+/**
+ * Luca Mawyin, 400531739
+ * March 4, 2025
+ * Script file that lets users draw on canvas
+ */
+
 document.addEventListener("DOMContentLoaded", () => {
 
+    // Canvas data
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext('2d');
     let savedCanvas = null;
 
+    // Accessing stored data
     let borderWidth = localStorage.getItem('borderWidth') || 2;
     let borderColour = localStorage.getItem('borderColour') || "#000000";
     let shapeColour = localStorage.getItem('shapeColour') || "#FFFFFF";
@@ -11,9 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("border-colour").value = borderColour;
     document.getElementById("border-width").value = borderWidth;
     document.getElementById("shape-colour").value = shapeColour;
-
-    let offsetX;
-    let offsetY;
 
     // Shape objects
     class Triangle{
@@ -28,6 +33,12 @@ document.addEventListener("DOMContentLoaded", () => {
             this.borderWidth = borderWidth;
         }
     
+        /**
+        * Gets initial points to start drawing
+        *
+        * @param {Event} e
+        * @returns void
+        */
         startDraw(e){
             // Setting initial points
             const rect = canvas.getBoundingClientRect();
@@ -39,12 +50,19 @@ document.addEventListener("DOMContentLoaded", () => {
             savedCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height, { willReadFrequently: true });
         }
     
+        /**
+        * Gets initial points to start drawing
+        *
+        * @param {Event} e
+        * @returns void
+        */
         stopDraw(e){
             this.drawing = false;
             this.updateShape(e);
         }
     }
-    
+
+    // Square class
     class Square{
         constructor (){
             this.type = "Square"
@@ -56,7 +74,13 @@ document.addEventListener("DOMContentLoaded", () => {
             this.borderColour = borderColour;
             this.borderWidth = borderWidth;
         }
-    
+
+        /**
+        * Gets initial points to start drawing
+        *
+        * @param {Event} e
+        * @returns void
+        */
         startDraw(e){
             // Setting initial points
             const rect = canvas.getBoundingClientRect();
@@ -66,11 +90,23 @@ document.addEventListener("DOMContentLoaded", () => {
             // Saving current state of board
             savedCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height, { willReadFrequently: true });
         }
-    
+
+        /**
+        * stops drawing 
+        *
+        * @param {Event} e
+        * @returns void
+        */
         stopDraw(e){
             this.updateShape(e);
         }
     
+        /**
+        * Gets final positions and creates shape based on endpoints
+        *
+        * @param {Event} e
+        * @returns void
+        */
         updateShape(e){
             const rect = canvas.getBoundingClientRect();
             this.endX = e.clientX - rect.left;
@@ -82,18 +118,15 @@ document.addEventListener("DOMContentLoaded", () => {
             this.width = this.endX-this.startX;
             this.height = this.endY-this.startY;
     
-            ctx.beginPath();
-
-            ctx.rect(this.startX,this.startY,this.width,this.height);
-            ctx.fillStyle = this.shapeColour;
-            ctx.lineWidth = this.borderWidth;
-            ctx.fill();
-
-            ctx.strokeStyle = this.borderColour;
-            ctx.stroke();
-            ctx.beginPath();
+            this.loadShape();
         }
-    
+
+        /**
+        * Loads shape using already stored values
+        *
+        * @param {}
+        * @returns void
+        */
         loadShape(){
             ctx.beginPath();
             ctx.rect(this.startX,this.startY,this.width,this.height);
@@ -108,6 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
     
+    // Circle class
     class Circle{
         constructor (){
             this.type = "Circle"
@@ -119,7 +153,13 @@ document.addEventListener("DOMContentLoaded", () => {
             this.borderColour = borderColour;
             this.borderWidth = borderWidth;
         }
-    
+
+        /**
+        * Gets initial points to start drawing
+        *
+        * @param {Event} e
+        * @returns void
+        */    
         startDraw(e){
             // Setting initial points
             const rect = canvas.getBoundingClientRect();
@@ -129,11 +169,23 @@ document.addEventListener("DOMContentLoaded", () => {
             // Saving current state of board
             savedCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height, { willReadFrequently: true });
         }
-    
+
+        /**
+        * stops drawing 
+        *
+        * @param {Event} e
+        * @returns void
+        */    
         stopDraw(e){
             this.updateShape(e);
         }
     
+        /**
+        * Gets final positions and creates shape based on endpoints
+        *
+        * @param {Event} e
+        * @returns void
+        */        
         updateShape(e){
     
             // Getting endpoints
@@ -161,7 +213,13 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.stroke();
             ctx.beginPath();      
         }
-    
+
+        /**
+        * Loads shape using already stored values
+        *
+        * @param {}
+        * @returns void
+        */
         loadShape(){
             ctx.beginPath();
             ctx.arc(this.centreX,this.centreY,this.radius,0,2*Math.PI);
@@ -176,55 +234,93 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Brush object
     class Brush{
         constructor (){
             this.type = "Brush"
-            this.startX;
-            this.startY;
-            this.endX;
-            this.endY;
+            this.points = [];
             this.drawing = false;
         }
-    
+        
+        /**
+        * Gets initial points to start drawing
+        *
+        * @param {Event} e
+        * @returns void
+        */        
         startDraw(e){
             // Setting initial points
             const rect = canvas.getBoundingClientRect();
-            this.startX = e.clientX - rect.left;
-            this.startY = e.clientY - rect.top;
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
     
             // Saving current state of board
             this.drawing = true;
             savedCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height, { willReadFrequently: true });
 
+            this.points.push({ x, y });
+
             ctx.beginPath();
             ctx.lineTo(this.startX, this.startY);
         }
 
+        /**
+        * Gets current points, adds to array, prints points
+        *
+        * @param {Event} e
+        * @returns void
+        */    
         draw(e) {
             if (!this.drawing) return;
     
             const rect = canvas.getBoundingClientRect();
-            const currentX = e.clientX - rect.left;
-            const currentY = e.clientY - rect.top;
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
     
+            // Draw each point and add to array to store
             ctx.beginPath();
-            ctx.moveTo(this.lastX, this.lastY);
-            ctx.lineTo(currentX, currentY);
+            ctx.moveTo(this.points[this.points.length - 1].x, this.points[this.points.length - 1].y);
+            ctx.lineTo(x, y);
             ctx.lineWidth = this.borderWidth;
             ctx.strokeStyle = this.borderColour;
             ctx.stroke();
     
-            this.lastX = currentX;
-            this.lastY = currentY;
+            this.points.push({x, y});
         }
 
+        /**
+        * Declaring the drawing as done
+        *
+        * @param {}
+        * @returns void
+        */    
         stopDraw(e){
             this.drawing = false;
         }
 
         // These need to be here because they get called automatically
         updateShape(){}
-        loadShape(){}
+
+        /**
+        * Loads shape based on already existing data within object
+        *
+        * @param {}
+        * @returns void
+        */    
+        loadShape() {
+            if (this.points.length < 2) return;
+    
+            ctx.beginPath();
+            ctx.lineWidth = this.borderWidth;
+            ctx.strokeStyle = this.borderColour;
+    
+            for (let i = 1; i < this.points.length; i++) {
+                ctx.moveTo(this.points[i - 1].x, this.points[i - 1].y);
+                ctx.lineTo(this.points[i].x, this.points[i].y);
+            }
+    
+            ctx.stroke();
+        }
     }
 
     // Setting canvas size here
@@ -271,18 +367,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 return brush;
         }
     });
-
     shapeList.forEach(shape => shape.loadShape());
 
-
+    // Undo btn eventListener
     document.querySelector("#edit-btn input[value='Undo']").addEventListener("click", () => {
         shapeList.pop();
         localStorage.setItem("shapeList", JSON.stringify(shapeList));
         ctx.clearRect(0,0,canvas.width,canvas.height);
         shapeList.forEach(shape => shape.loadShape())
-
-
     });
+
+    // Setting preferences for each input field
     document.querySelectorAll('#preference-btn input').forEach(box => {
         switch (box.id.toLowerCase()) {
             case "border-colour":
@@ -312,6 +407,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Tracking current shape
     document.querySelectorAll('#shape-btn input').forEach(button => {
         button.addEventListener('click', () => {
+
+            // Showing which shape is currently active
+            document.querySelectorAll('#shape-btn input').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
 
             switch(button.value){
                 case "Triangle":
@@ -384,9 +484,11 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("border-width").value = borderWidth;
         document.getElementById("shape-colour").value = shapeColour;
         ctx.clearRect(0,0,canvas.width,canvas.height);
+        document.querySelectorAll('#shape-btn input').forEach(btn => btn.classList.remove('active'));
         resetAlert.showModal();
     });
 
+    // Alert box close
     document.querySelector('#reset-board button').addEventListener('click', () => {
         resetAlert.close();
     })
