@@ -4,7 +4,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const ctx = canvas.getContext('2d');
 
-    let current = null;
+    let current = {
+        shape: "",
+        borderColor: "",
+        shapeColor: "",
+        width: "",
+        height: ""
+    };
+
+    const resizeCanvas = () => {
+        canvas.width = window.innerWidth * 0.75;
+        canvas.height = window.innerHeight * 0.75;
+
+        canvas.style.width = canvas.width + 'px';
+        canvas.style.height = canvas.height + 'px';
+
+        offsetX = canvas.offsetLeft;
+        offsetY = canvas.offsetTop;
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
 
     let drawHistory = [];
@@ -73,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fillStyle = "gray";
             ctx.fillRect(this.x, this.y, this.width, this.height);
         }
-        
+
     }
     // Set up edit buttons with listeners
     document.querySelectorAll('#edit-btn input').forEach(button => {
@@ -91,24 +111,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.querySelectorAll('#preference-btn input').forEach(button => {
-        button.addEventListener('click', () => {
-            switch (this.id.toLowerCase()) {
-                case "border-color":
-                    current.borderColor = this.value;
-                    break;
-    
-                case "shape-color":
-                    current.shapeColor = this.value;
-                    break;
-                case "width":
-                    current.width = this.value;
-                    break;
-                case "height":
-                    current.height = this.value;
-                    break;
-            }
-        });
+    document.querySelectorAll('#preference-btn input').forEach(box => {
+        switch (box.id.toLowerCase()) {
+            case "border-color":
+                box.addEventListener("input", () => {current.borderColor = box.value});
+                break;
+            case "shape-color":
+                box.addEventListener("input", () => {current.shapeColor = box.value});
+                break;
+            case "width":
+                box.addEventListener("input", () => {current.width = Math.abs(parseInt(box.value))});
+                break;
+            case "height":
+                box.addEventListener("input", () => {current.height = Math.abs(parseInt(box.value))});
+                break;
+        }
     });
     // For edit buttons
     function edit(name) {
@@ -128,77 +145,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // canvas.width = window.innerWidth;
     // canvas.height = window.innerHeight;
 
-    // Works for css sized canvas, above doesnt
-    canvas.height = ctx["canvas"].clientHeight;
-    canvas.width = ctx["canvas"].clientWidth;
 
 
-    // Tracking current shape
-    document.querySelectorAll('#shape-btn input').forEach(button => {
-        button.addEventListener('click', () => {
-            current = button.value;
-        });
-    });
 
 
-    class Triangle {
-        constructor(x, y, sideLength, strokeColor, fillColor) {
-            this.sideLength = sideLength;
-            this.strokeColor = strokeColor;
-            this.fillColor = fillColor;
-
-        }
-        draw() {
-            ctx.strokeStyle = this.strokeColor;
-            ctx.fillStyle = this.fillColor;
-            ctx.lineWidth = 5;
-            ctx.beginPath();
-            ctx.moveTo(59, 50);
-            ctx.lineTo(0, 0);
-            ctx.stroke();
-
-        }
-
-
-    }
-    
-    class Circle {
-        constructor(x, y, width, height, strokeColor, fillColor) {
-            this.radius = radius;
-            this.strokeColor = strokeColor;
-            this.fillColor = fillColor;        
-        }
-
-        draw() {
-            ctx.strokeStyle = this.strokeColor;
-            ctx.fillStyle = this.fillColor;
-            ctx.lineWidth = 5;
-            ctx.beginPath();
-            ctx.moveTo(59, 50);
-            ctx.lineTo(0, 0);
-            ctx.stroke();
-        }
-        clear() {
-            ctx.strokeStyle = "gray";
-            ctx.fillStyle = "gray";
-            ctx.fillRect(this.x, this.y, this.width, this.height);
-        }
-    }
-    
-    class Square {
-        constructor(width, strokeColor, fillColor) {
-            this.width = width;
-            this.strokeColor = strokeColor;
-            this.fillColor = fillColor;       
-        }
-        draw() {
-            ctx.strokeStyle = this.strokeColor;
-            ctx.fillStyle = this.fillColor;
-            ctx.fillRect(this.x, this.y, this.width, this.height);
-
-        }
-    }
- 
     document.querySelectorAll('body button').forEach(button => {
 
 
@@ -208,16 +158,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
 
-   
-    function draw(shape) {
-        switch (shape.toLowerCase()) {
-            case "reset":
 
-                context.clearRect(0, 0, canvas.width, canvas.height);
-
-                break;
-        }
-    }
+  
     // Ensure canvas has a proper size
 
     // canvas.width = window.innerWidth;
@@ -225,14 +167,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let drawing = false;
 
     function getMousePos(e) {
- 
+
         const rect = canvas.getBoundingClientRect();
         return {
             x: Math.floor(e.clientX - rect.left),
             y: Math.floor(e.clientY - rect.top)
         };
     }
-    
+
     let startPoint = 0;
     let endPoint = 0;
 
@@ -241,19 +183,12 @@ document.addEventListener('DOMContentLoaded', () => {
         drawHistory = [];
         ctx.fillStyle = "gray";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-
     }
+
     function undo() {
         let last = drawHistory.pop();
         last.clear();
         drawHistory[drawHistory.length - 1].draw();
-
-
-        
-
-
-
     }
 
     // Gets height, width from 2 points
@@ -278,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startPoint = getMousePos(e);
 
         // add event listener for drawing
+      
         canvas.addEventListener("mousemove", draw);
 
 
@@ -286,37 +222,49 @@ document.addEventListener('DOMContentLoaded', () => {
     function draw(e) {
 
         if (!drawing) return;
-
+        console.log(current);
 
         const pos = getMousePos(e);
-
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
+        switch (current.shape) {
+             // current has properties: current.borderColor, current.fillColor, current.width, current.length
+            case "Rectangle":
+                // put code for creating new rect
+                break;     
+            case "Triangle":
+                // put code for creating new triangle
+                break;
+            case "Circle":
+                // put code for creating new circle
+                break;
+            case "Brush":
+                
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                break;
+        }
+  
     }
 
     function stopDraw(e) {
         if (drawing) {
             drawing = false;
             endPoint = getMousePos(e);
-            
+
             // Decide what shape based on current selected
-             
+
             switch (current.shape) {
-                case "Rectangle": 
+                case "Rectangle":
                     console.log("rect");
                     const dim = calcDimensions(startPoint, endPoint);
-                    const rect = new Rectangle(startPoint.x, startPoint.y, dim.width, dim.height, "rgb(255, 255, 255)", "rgb(255, 255, 255)");
+                    const rect = new Rectangle(startPoint.x, startPoint.y, dim.width, dim.height, "rgb(0, 0, 0)", "rgb(0, 0, 0)");
                     rect.draw();
                     drawHistory.push(rect);
                     break;
-    
-    
             }
-      
+
             canvas.removeEventListener("mousemove", draw);
             ctx.beginPath(); // Reset path to avoid connecting new strokes
         }
-
     }
 
     // Set drawing properties
@@ -326,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event listeners
     canvas.addEventListener("mousedown", startDraw);
-    
+
     canvas.addEventListener("mouseup", stopDraw);
     canvas.addEventListener("mouseleave", stopDraw);
 });
