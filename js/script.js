@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
             endPoint = getMousePos(e);
             
             // Decide what shape based on current selected
-            switch (current) {
+            switch (current.shape) {
 
                 case "Rectangle": 
                     console.log("rect");
