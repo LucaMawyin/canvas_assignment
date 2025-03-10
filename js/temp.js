@@ -1,5 +1,6 @@
 /**
  * Luca Mawyin, 400531739
+ * Neelan Thurairajah, 400581985
  * March 4, 2025
  * Script file that lets users draw on canvas
  */
@@ -293,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
         *
         * @param {}
         * @returns void
-        */    
+        */   
         stopDraw(e){
             this.drawing = false;
         }
@@ -423,7 +424,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 case "Circle":
                     current = new Circle();
                     break;
-
                 case "Brush":
                     current = new Brush();
                     break;
