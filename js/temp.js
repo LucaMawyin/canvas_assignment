@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
             this.borderColour = borderColour;
             this.borderWidth = borderWidth;
         }
-    
+
         /**
         * Gets initial points to start drawing
         *
@@ -46,19 +46,58 @@ document.addEventListener("DOMContentLoaded", () => {
             this.startY = e.clientY - rect.top;
     
             // Saving current state of board
-            this.drawing = true;
             savedCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height, { willReadFrequently: true });
         }
-    
+
         /**
-        * Gets initial points to start drawing
+        * stops drawing 
         *
         * @param {Event} e
         * @returns void
         */
         stopDraw(e){
-            this.drawing = false;
             this.updateShape(e);
+        }
+    
+        /**
+        * Gets final positions and creates shape based on endpoints
+        *
+        * @param {Event} e
+        * @returns void
+        */
+        updateShape(e){
+            const rect = canvas.getBoundingClientRect();
+            this.endX = e.clientX - rect.left;
+            this.endY = e.clientY - rect.top;        
+            // Restoring old canvas before adding new shape
+            ctx.putImageData(savedCanvas, 0, 0);
+    
+            // Calculating values
+            this.width = this.endX-this.startX;
+            this.height = this.endY-this.startY;
+    
+            this.loadShape();
+        }
+
+        /**
+        * Loads shape using already stored values
+        *
+        * @param {}
+        * @returns void
+        */
+        loadShape() {
+            ctx.beginPath();
+            ctx.moveTo(this.startX, this.startY);
+            ctx.lineTo(this.endX, this.startY);
+            ctx.lineTo(this.startX, this.endY);
+            ctx.closePath();
+    
+            ctx.fillStyle = this.shapeColour;
+            ctx.fill();
+    
+            ctx.lineWidth = this.borderWidth;
+            ctx.strokeStyle = this.borderColour;
+            ctx.stroke();
         }
     }
 
